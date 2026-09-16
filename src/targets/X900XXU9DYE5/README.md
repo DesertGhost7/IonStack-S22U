@@ -20,7 +20,7 @@ Architecture: aarch64
 
 This codebase originally evolved from research on the **S25 Ultra** (kernel v6.x / `pa3q`) and was subsequently ported to the **S22 Ultra** (`b0q`, kernel v5.10) by **[sarabpal-dev](https://github.com/sarabpal-dev/IonStack-S22U/blob/main/MEMORY.md)**.   
 The **Tab S8 Ultra (`gts8uwifi`)** target builds on the v5.10 porting work originally developed for `b0q`. 
-Since both the Snapdragon variant of the S22 Ultra (`b0q`, e.g., SM-S908U/W) and the Tab S8 Ultra (`gts8u` family) are based on the same SM8450/Taro platform and use an Android GKI-based v5.10 kernel, they share the same v5.10/GKI kernel architecture and execution model when compared with the v6.x architecture. While the specific numerical offsets inside `target.h` are target- and firmware-specific, they were extracted using the standard generation method (see [`target_generator/README.md`](https://github.com/sarabpal-dev/IonStack-S22U/blob/main/target_generator/README.md)) without modifying the underlying exploit logic or strings.
+Since both the Snapdragon variant of the S22 Ultra (`b0q`, e.g., SM-S908U/W) and the Tab S8 Ultra (`gts8` family) are based on the same SM8450/Taro platform and use an Android GKI-based v5.10 kernel, they share the same v5.10/GKI kernel architecture and execution model when compared with the v6.x architecture. While the specific numerical offsets inside `target.h` are target- and firmware-specific, they were extracted using the standard generation method (see [`target_generator/README.md`](https://github.com/sarabpal-dev/IonStack-S22U/blob/main/target_generator/README.md)) without modifying the underlying exploit logic or strings.
 
 ## Verification and Testing
 
@@ -48,6 +48,6 @@ The target was tested and verified in [QEMU](https://github.com/sarabpal-dev/qem
 ---
 
 > [!WARNING]
-> The offsets and symbol addresses in this target profile are generated specifically for the firmware build listed above. While the core exploit logic applies to other SM8450 (Kernel 5.10) devices, running this profile on different firmware builds may cause system instability or kernel panic.
+> The offsets and symbol addresses in this target profile are generated specifically for the firmware build listed above. While the core exploit logic applies to other SM8450 (Kernel 5.10) Samsung devices, running this profile on different firmware builds may cause system instability or kernel panic.
 > 
 > Use only on devices you own or are explicitly authorized to test.
