@@ -3,8 +3,8 @@
 Tools to extract kernel symbols, configs, and function offsets directly from an uncompressed kernel binary (`Image`) to auto-patch `target.h`.
 
 > [!NOTE]
-> This target generator is **only used to generate `target.h` for Samsung Galaxy S22 / S22 Ultra (b0q)** devices because this repository's exploit is only ported for S22 / S22 Ultra.
-> `generate_target.py` extracts a few dynamic offsets while other struct and system definitions remain identical throughout firmware versions.
+> This target generator extracts symbols and kernel offsets for **Samsung devices running the Linux Android 12 5.10 kernel** (covering Qualcomm Snapdragon and Samsung Exynos platforms).
+> `generate_target.py` calculates dynamic offsets and patches placeholders while kernel struct definitions and layouts remain aligned with Samsung's 5.10 GKI implementation.
 
 ---
 
@@ -40,14 +40,29 @@ Calculates dynamic offsets using `kallsyms.txt`, `config.txt`, and disassembly f
 python3 generate_target.py kallsyms.txt config.txt Image --template target.h -o target.h
 ```
 
-### Step 6: Create Target Directory and Compile
-After generating `target.h`:
-1. Create a folder in `src/targets/` named exactly after your firmware version (e.g. `src/targets/S908WVLS8FYG7`).
-2. Move your generated `target.h` into that newly created folder (`src/targets/<YOUR_FIRMWARE_VERSION>/target.h`).
-3. Run `make` passing your firmware version as `PROJECT`:
-```bash
-make PROJECT=<YOUR_FIRMWARE_VERSION>
-```
+### Step 6: Create Target Directory & Porting Setup
+
+When adding support for a new device build, **do not just place a bare `target.h` into an empty folder**:
+
+1. **Find a matching sibling target**:
+   Check `src/targets/` (refer to the supported devices table in the main [README.md](../README.md)) to see if an existing target matches your device model, SoC family (Snapdragon vs Exynos), or carrier variant (e.g. `S901U` vs `S901U1`, `S906E`, `S908B`, `S908W`, etc.).
+2. **Copy matching target files**:
+   Many targets include target-specific fixes, race timing parameters, or source overrides (such as `main.c`, `fops.c`, `su_daemon.c`, `exp32/`, or `exp64/`). Create your target folder and copy the contents of the closest sibling target into it:
+   ```bash
+   mkdir -p ../src/targets/<YOUR_FIRMWARE_BUILD>
+   cp -r ../src/targets/<SIBLING_TARGET>/* ../src/targets/<YOUR_FIRMWARE_BUILD>/
+   ```
+   *(If your device matches the generic baseline implementation with no sibling overrides needed, you can start from a clean directory).*
+3. **Place your generated `target.h`**:
+   Copy or overwrite your newly generated `target.h` into your new target folder:
+   ```bash
+   cp target.h ../src/targets/<YOUR_FIRMWARE_BUILD>/target.h
+   ```
+4. **Compile for your target**:
+   Build the exploit binaries by specifying your target name in `PROJECT`:
+   ```bash
+   make PROJECT=<YOUR_FIRMWARE_BUILD> clean preload root-helper
+   ```
 
 ---
 

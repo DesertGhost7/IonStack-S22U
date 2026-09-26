@@ -1,4 +1,4 @@
-# CVE-2026-43499 - Galaxy S22 Ultra
+# CVE-2026-43499 - Samsung 5.10 Kernel Devices (IonStack)
 
 https://github.com/user-attachments/assets/f3d0858d-f8f5-444f-8ae5-541c2bc744c3
 
@@ -13,25 +13,37 @@ https://github.com/user-attachments/assets/f3d0858d-f8f5-444f-8ae5-541c2bc744c3
   </tr>
 </table>
 
-This repository contains a device-specific port of the CVE-2026-43499
-exploit for the Samsung Galaxy S22 Ultra (SM-S908W).
+While this repository originated as a device-specific port for the Galaxy S22 Ultra, **the project has since shifted and expanded to support all Samsung devices running the Linux Android 12 5.10 kernel**. 
 
-## Supported target
+The exploit framework accommodates both **Qualcomm** (e.g. Snapdragon 8 Gen 1 / SM8450) and **Samsung Exynos** (e.g. Exynos 2200) architectures, adapting kernel layouts, CFI dispatch, KASLR slide derivation, and race choreography to 5.10 GKI structures. Any Samsung device running a 5.10 kernel can be supported by extracting its symbols and struct layouts into a target folder under `src/targets/<TARGET>` using `target_generator`.
 
-```text
-Device: Samsung Galaxy S22 Ultra (SM-S908W)
-Codename: b0q
-Android: 15 / SDK 35
-Build number: AP3A.240905.015.A2.S908WVLS8FYG7
-Build display ID: AP3A.240905.015.A2.S908WVLS8FYG7
-Build fingerprint: samsung/b0qcsx/b0q:15/AP3A.240905.015.A2/S908WVLS8FYG7:user/release-keys
-Kernel: 5.10.226-android12-9-30958166-abS908WVLS8FYG7
-Architecture: aarch64
-```
+## Supported Devices & Targets
 
-The offsets and structure layouts in this repository are specific to the
-firmware above. Other models and firmware builds are not supported by this
-target profile.
+The following pre-configured target profiles are included in `src/targets/<TARGET>`. Each profile contains verified kernel offsets, structure layouts, and target configurations for that specific firmware release:
+
+| Device | Model | Target / Build | SoC | Android | Region / Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Galaxy S22** | SM-S901B | `S901BXXSNGZD7` | **Samsung Exynos 2200** | Android 16 | Europe / International |
+| **Galaxy S22** | SM-S901E | `S901EXXSEGZE3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | Global / Latin America / Asia / Africa |
+| **Galaxy S22** | SM-S901U1 | `S901U1UESAGZF3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | USA (Factory Unlocked) |
+| **Galaxy S22** | SM-S901U1 | `S901U1UESAGZH3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | USA (Factory Unlocked) |
+| **Galaxy S22** | SM-S901U | `S901USQSAGZF3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | USA (Carrier Locked) |
+| **Galaxy S22** | SM-S901U | `S901USQSAGZH3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | USA (Carrier Locked) |
+| **Galaxy S22** | SM-S901U | `S901USQU2BVK1` | **Qualcomm Snapdragon 8 Gen 1** | Android 13 | USA (Carrier Locked) |
+| **Galaxy S22** | SM-S901W | `S901WVLS4DWL3` | **Qualcomm Snapdragon 8 Gen 1** | Android 14 | Canada |
+| **Galaxy S22** | SM-S901W | `S901WVLSAGZH3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | Canada |
+| **Galaxy S22+** | SM-S906E | `S906EXXSEGZE3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | Global / Latin America / Asia / Africa |
+| **Galaxy S22 Ultra** | SM-S908B | `S908BXXSMGZB2` | **Samsung Exynos 2200** | Android 16 | Europe / International |
+| **Galaxy S22 Ultra** | SM-S908B | `S908BXXSNGZD7` | **Samsung Exynos 2200** | Android 16 | Europe / International |
+| **Galaxy S22 Ultra** | SM-S908E | `S908EXXSEGZE3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | Global / Latin America / Asia / Africa |
+| **Galaxy S22 Ultra** | SM-S908N | `S908NKSS9GZE5` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | South Korea |
+| **Galaxy S22 Ultra** | SM-S908W | `S908WVLS8FYG7` | **Qualcomm Snapdragon 8 Gen 1** | Android 15 | Canada (Baseline Profile) |
+| **Galaxy S22 Ultra** | SM-S908W | `S908WVLSAGZE3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | Canada |
+| **Galaxy S22 Ultra** | SCG14 | `SCG14KDS1EZE3` | **Qualcomm Snapdragon 8 Gen 1** | Android 16 | Japan (au KDDI) |
+| **Galaxy Tab S8 Ultra** | SM-X900 | `X900XXU9DYE5` | **Qualcomm Snapdragon 8 Gen 1** | Android 15 | Global (Wi-Fi) |
+
+> [!NOTE]
+> The offsets and structure layouts are specific to each target build. Always build with the matching `PROJECT=<TARGET>` parameter for your device's exact firmware version.
 
 ## Reference source
 
@@ -48,9 +60,9 @@ The upstream Apache License 2.0 is retained in [LICENSE](LICENSE), and attributi
 
 ## Main porting changes
 
-- Ported exploit from v6.6 kernel (Galaxy S25 Ultra) to Android v5.10 kernel (Galaxy S22 Ultra / b0q).
-- Added the `b0q` / `S908WVLS8FYG7` target offsets (`src/targets/S908WVLS8FYG7/target.h`) and kernel structure layouts.
-- Replaced the pselect race with the `exp32` route: futex choreography, 32-bit stack stamp, and `sched_setattr` run in an embedded 32-bit child stage (`src/exp32/`).
+- Ported exploit from v6.6 kernel (Galaxy S25 Ultra) to the Android v5.10 kernel architecture (supporting all Samsung 5.10 devices across Qualcomm and Exynos).
+- Added modular target profiles under `src/targets/<TARGET>` with kernel structure layouts and offset generation via `target_generator`.
+- Replaced the pselect race with the `exp32` route (or `exp64` where applicable): futex choreography, 32-bit stack stamp, and `sched_setattr` run in an embedded child stage (`src/exp32/`).
 - Added tracefs-based automatic KASLR slide recovery for the Samsung kernel.
 - Ported fake PI waiter/task layout, CFI/FOPS stage, and physical read/write primitive for v5.10.
 - Added a KDP-safe `system_unbound_wq` user-mode-helper root path and updated runtime SELinux enforcement target to `selinux_state.enforcing`.
@@ -65,10 +77,16 @@ The upstream Apache License 2.0 is retained in [LICENSE](LICENSE), and attributi
 
 ## Build
 
-Set `ANDROID_NDK_HOME` to Android NDK r27+ or a compatible toolchain, then run:
+Set `ANDROID_NDK_HOME` to Android NDK r27+ or a compatible toolchain, then run with your chosen `PROJECT=<TARGET>` from the table above:
 
 ```sh
+# Example building for Galaxy S22 Ultra (SM-S908W):
 make PROJECT=S908WVLS8FYG7 clean preload root-helper
+
+# Or specify any target from the supported device list:
+# make PROJECT=S901BXXSNGZD7 clean preload root-helper   # Galaxy S22 (Exynos)
+# make PROJECT=S906EXXSEGZE3 clean preload root-helper   # Galaxy S22+ (Snapdragon)
+# make PROJECT=X900XXU9DYE5 clean preload root-helper    # Galaxy Tab S8 Ultra
 ```
 
 To build for a QEMU environment running the Android kernel with a Buildroot filesystem:
@@ -76,24 +94,35 @@ To build for a QEMU environment running the Android kernel with a Buildroot file
 - **QEMU Kernel Execution Guide**: Setup and run guide at [QEMU Samsung README](https://github.com/sarabpal-dev/qemu/blob/samsung/docs/samsung/README.md)
 
 ```sh
-make USE_BUILDROOT=1 PROJECT=S908WVLS8FYG7 clean preload root-helper
+make USE_BUILDROOT=1 PROJECT=<TARGET> clean preload root-helper
 ```
 
 Outputs:
 
 ```text
-build/S908WVLS8FYG7/bin/cve-2026-43499
-build/S908WVLS8FYG7/bin/cve-2026-43499-root
-build/S908WVLS8FYG7/bin/cve-exp32
+build/<TARGET>/bin/cve-2026-43499
+build/<TARGET>/bin/cve-2026-43499-root
+build/<TARGET>/bin/cve-exp32 (or cve-exp64 for 64-bit exp targets like BVK1)
 ```
 
 ## Deploy
 
+Push the binaries built for your target to the device:
+
 ```sh
-adb push build/S908WVLS8FYG7/bin/cve-2026-43499 /data/local/tmp/cve-2026-43499
-adb push build/S908WVLS8FYG7/bin/cve-2026-43499-root /data/local/tmp/cve-2026-43499-root
-adb push build/S908WVLS8FYG7/bin/cve-exp32 /data/local/tmp/cve-exp32
-adb shell chmod 755 /data/local/tmp/cve-2026-43499 /data/local/tmp/cve-2026-43499-root /data/local/tmp/cve-exp32
+export TARGET=S908WVLS8FYG7  # Replace with your target name
+
+adb push build/$TARGET/bin/cve-2026-43499 /data/local/tmp/cve-2026-43499
+adb push build/$TARGET/bin/cve-2026-43499-root /data/local/tmp/cve-2026-43499-root
+# Push the stage binary (cve-exp32 or cve-exp64 depending on target):
+if [ -f "build/$TARGET/bin/cve-exp64" ]; then
+    adb push build/$TARGET/bin/cve-exp64 /data/local/tmp/cve-exp64
+    adb shell chmod 755 /data/local/tmp/cve-exp64
+else
+    adb push build/$TARGET/bin/cve-exp32 /data/local/tmp/cve-exp32
+    adb shell chmod 755 /data/local/tmp/cve-exp32
+fi
+adb shell chmod 755 /data/local/tmp/cve-2026-43499 /data/local/tmp/cve-2026-43499-root
 ```
 
 ## Run
